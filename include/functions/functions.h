@@ -6,6 +6,7 @@
 #include <random>
 #include <exception>
 
+
 using namespace std;
     namespace rnd {
         class Rand {
@@ -23,30 +24,125 @@ using namespace std;
         };	
     }
 	namespace set {
+        template<typename T>
         class Node {
         public:
-            int data;
-            Node* left;
-            Node* right;
-            Node(int value) : data(value), left(nullptr), right(nullptr) {}
+            T data;
+            Node<T>* left;
+            Node<T>* right;
+            Node(T value) : data(value), left(nullptr), right(nullptr) {}
         };
+        template<typename T>
         class MySet {
         private:
-            Node* root;
-            void clear(Node* node);
-            Node* copy(Node* node);
-            void print(Node* node);
-            bool insert(Node*& node, int value);
-            bool contains(Node* node, int valu);
-            bool erase(Node*& node, int valu);
+            Node<T>* root;
+            void clear(Node<T>* node) {
+                if (node) {
+                    clear(node->left);
+                    clear(node->right);
+                    delete node;
+                }
+            }
+            Node<T>* copy(Node<T>* node) {
+                if (node) {
+                    Node<T>* new_node = new Node<T>(node->data);
+                    new_node->left = copy(node->left);
+                    new_node->right = copy(node->right);
+                    return new_node;
+                }
+                return nullptr;
+            }
+            void print(Node<T>* node) { //ËÊÏ
+                if (node) {
+                    print(node->left);
+                    std::cout << node->data << " ";
+                    print(node->right);
+                }
+            }
+            bool insert(Node<T>*& node, T value) {
+                if (!node) {
+                    node = new Node<T>(value);
+                    return true;
+                }
+                if (value < node->data) {
+                    return insert(node->left, value);
+                }
+                else if (value > node->data) {
+                    return insert(node->right, value);
+                }
+                return false;
+            }
+            bool contains(Node<T>* node, T value) {
+                if (!node) {
+                    return false;
+                }
+                if (value < node->data) {
+                    return contains(node->left, value);
+                }
+                else if (value > node->data) {
+                    return contains(node->right, value);
+                }
+                return true;
+            }
+            bool erase(Node<T>*& node, T value) {
+                if (!node) {
+                    return false;
+                }
+                if (value < node->data) {
+                    return erase(node->left, value);
+                }
+                else if (value > node->data) {
+                    return erase(node->right, value);
+                }
+                else {
+                    if (!node->left) {
+                        Node<T>* temp = node->right;
+                        delete node;
+                        node = temp;
+                    }
+                    else if (!node->right) {
+                        Node<T>* temp = node->left;
+                        delete node;
+                        node = temp;
+                    }
+                    else {
+                        Node<T>* temp = node->right;
+                        while (temp->left) {
+                            temp = temp->left;
+                        }
+                        node->data = temp->data;
+                        erase(node->right, temp->data);
+                    }
+                    return true;
+                }
+            }
         public:
             MySet() : root(nullptr) {}
-            MySet(const MySet& other);
-            ~MySet();
-            MySet& operator=(const MySet& other);
-            void print();
-            bool insert(int value);
-            bool contains(int value);
-            bool erase(int value);
+            MySet(const MySet<T>& other) {
+                root = copy(other.root);
+            }
+            ~MySet() {
+                clear(root);
+            }
+            MySet<T>& operator=(const MySet<T>& other) {
+                if (this != &other) {
+                    clear(root);
+                    root = copy(other.root);
+                }
+                return *this;
+            }
+            void print() {
+                print(root);
+                std::cout << std::endl;
+            }
+            bool insert(T value) {
+                return insert(root, value);
+            }
+            bool contains(T value) {
+                return contains(root, value);
+            }
+            bool erase(T value) {
+                return erase(root, value);
+            }
         };
 	}
