@@ -236,3 +236,44 @@ using namespace std;
             return result;
         }
     }
+    double get_time_fill_V(size_t count) {
+        rnd::Rand test_seed(0, 0, count * 10);
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i <= 100; i++) {
+            vector<int> test_vec;
+            for (int i = 0; i <= count; i++)
+                test_vec.push_back(test_seed.generate_random_number());
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 100;
+    }
+    double get_time_contains_V(vector<int>& arr, size_t count) {
+        rnd::Rand test_seed(0, 0, count * 10);
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i <= 1000; i++) {
+            find(arr.begin(), arr.end(), test_seed.generate_random_number());
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000;
+    }
+    double get_time_erase_V(vector<int>& test_set, size_t count) {
+        rnd::Rand test_seed(0, 0, count * 10);
+        vector<int> test_vec_copy(test_set);
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i <= 1000; i++) {
+            const auto del_obj = remove(test_vec_copy.begin(), test_vec_copy.end(), test_seed.generate_random_number());
+            test_vec_copy.erase(del_obj, test_vec_copy.end());
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000;
+    }
+    double get_time_insert_V(vector<int>& test_set, size_t count) {
+        rnd::Rand test_seed(0, 0, count * 10);
+        vector<int> test_vec_copy = test_set;
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i <= 1000; i++) {
+            test_vec_copy.push_back(test_seed.generate_random_number());
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }

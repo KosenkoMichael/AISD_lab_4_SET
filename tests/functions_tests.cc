@@ -56,6 +56,26 @@ TEST(test_mytests, test) {
     s3.fill(1000);
     s4.fill(10000);
     s5.fill(100000);
+    vector<int> v3(1000);
+    vector<int> v4(10000);
+    vector<int> v5(100000);
+    cout << "time for fill vector>>\n\t1000 = "
+        << get_time_fill_V(1000) / 1000 << " ms\n\t10000 = "
+        << get_time_fill_V(10000) / 1000 << " ms\n\t100000 = "
+        << get_time_fill_V(100000) / 1000 << " ms" << endl;
+    cout << "time for contains vector>>\n\t1000 = "
+        << get_time_contains_V(v3, 1000) / 1000 << " ms\n\t10000 = "
+        << get_time_contains_V(v4, 10000) / 1000 << " ms\n\t100000 = "
+        << get_time_contains_V(v5, 100000) / 1000 << " ms" << endl;
+    cout << "time for insert vector>>\n\t1000 = "
+        << get_time_insert_V(v3, 1000) / 1000 << " ms\n\t10000 = "
+        << get_time_insert_V(v4, 10000) / 1000 << " ms\n\t100000 = "
+        << get_time_insert_V(v5, 100000) / 1000 << " ms" << endl;
+    cout << "time for erase vector>>\n\t1000 = "
+        << get_time_erase_V(v3, 1000) / 1000 << " ms\n\t10000 = "
+        << get_time_erase_V(v4, 10000) / 1000 << " ms\n\t100000 = "
+        << get_time_erase_V(v5, 100000) / 1000 << " ms" << endl;
+
     cout << "time for fill >>\n\t1000 = " 
         << get_time_fill(1000)/1000 << " ms\n\t10000 = " 
         << get_time_fill(10000) / 1000 << " ms\n\t100000 = " 
