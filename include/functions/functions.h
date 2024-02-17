@@ -5,6 +5,17 @@
 #include <iomanip>
 #include <random>
 #include <exception>
+#include <chrono> 
+#include <cmath> 
+#include <functional>
+#include <vector>
+
+/*
+clock_t start = clock();
+clock_t end = clock();
+double seconds = (double)(end - start) / CLOCKS_PER_SEC;
+cout << "The time >> " << seconds << " seconds";
+*/
 
 
 using namespace std;
@@ -23,9 +34,9 @@ using namespace std;
             int generate_random_number();
         };	
     }
-	namespace set {
+    namespace set {
         template<typename T>
-        class Node {
+        struct Node {
         public:
             T data;
             Node<T>* left;
@@ -124,6 +135,18 @@ using namespace std;
             ~MySet() {
                 clear(root);
             }
+            Node<T>* getroot() {
+                return root;
+            }
+            MySet<T>& fill(size_t count) {
+                size_t cur_count = 0;
+                rnd::Rand test_seed(0, 0, count * 10);
+                while (cur_count != count) {
+                    if (insert(test_seed.generate_random_number()))
+                        cur_count++;
+                }
+                return *this;
+            }
             MySet<T>& operator=(const MySet<T>& other) {
                 if (this != &other) {
                     clear(root);
@@ -145,4 +168,71 @@ using namespace std;
                 return erase(root, value);
             }
         };
-	}
+        double get_time_fill(size_t count) {
+            auto start = std::chrono::high_resolution_clock::now();
+            for (int i = 0; i <= 100; i++) {
+                MySet<int> test_set;
+                test_set.fill(count);
+            }
+            auto end = std::chrono::high_resolution_clock::now();
+            return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()/100;
+        }
+        double get_time_contains(MySet<int>& test_set, size_t count) {
+            rnd::Rand test_seed(0, 0, count * 10);
+            auto start = std::chrono::high_resolution_clock::now();
+            for (int i = 0; i <= 1000; i++) {
+                test_set.contains(test_seed.generate_random_number());
+            }
+            auto end = std::chrono::high_resolution_clock::now();
+            return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()/1000;
+        }
+        double get_time_erase(MySet<int>& test_set, size_t count) {
+            rnd::Rand test_seed(0, 0, count * 10);
+            MySet test_set_copy(test_set);
+            auto start = std::chrono::high_resolution_clock::now();
+            for (int i = 0; i <= 1000; i++) {
+                test_set_copy.erase(test_seed.generate_random_number());
+            }
+            auto end = std::chrono::high_resolution_clock::now();
+            return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()/1000;
+        }
+        double get_time_insert(MySet<int>& test_set, size_t count) {
+            rnd::Rand test_seed(0, 0, count * 10);
+            MySet test_set_copy(test_set);
+            auto start = std::chrono::high_resolution_clock::now();
+            for (int i = 0; i <= 1000; i++) {
+                test_set_copy.insert(test_seed.generate_random_number());
+            }
+            auto end = std::chrono::high_resolution_clock::now();
+            return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        }
+        template<typename T>
+        MySet<T> logic_or(MySet<T>& set1, MySet<T>& set2) {
+            MySet<T> result;
+            std::function<void(Node<T>*)> m_union = [&](Node<T>* node) {
+                if (node != nullptr) {
+                    m_union(node->left);
+                    result.insert(node->data);
+                    m_union(node->right);
+                }
+            };
+            m_union(set1.getroot());
+            m_union(set2.getroot());
+            return result;
+        }
+        template<typename T>
+        MySet<T> logic_xor(MySet<T>& set1, MySet<T>& set2) {
+            MySet<T> result;
+            std::function<void(Node<T>*)> m_xor = [&](Node<T>* node) {
+                if (node != nullptr) {
+                    m_xor(node->left);
+                    if(!(set1.contains(node->data)&&set2.contains(node->data)))
+                        result.insert(node->data);
+                    m_xor(node->right);
+                }
+            };
+            m_xor(set2.getroot());
+            m_xor(set1.getroot());
+            return result;
+        }
+    }
